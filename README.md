@@ -19,3 +19,7 @@ npx skills add dcjohnston/bootstrap-skill
 5. **Skills** — find and install relevant skills via `npx skills`
 6. **CLAUDE.md** — orchestrator instructions with delegation patterns
 7. **Verify** — everything builds, lints, and type-checks clean
+
+
+<img width="1465" height="188" alt="Screenshot 2026-03-06 at 21 59 49" src="https://github.com/user-attachments/assets/0ff40676-d82e-4063-a52a-0c7da384fd18" />
+
