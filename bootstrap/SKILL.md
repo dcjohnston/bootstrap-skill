@@ -67,20 +67,53 @@ Common patterns:
 Steps:
 1. Initialize the project with the appropriate package manager
 2. Create the directory structure (see [project-structure.md](./references/project-structure.md))
-3. Set up the entry point / CLI
-4. Create placeholder files for each module
-5. Create the test directory structure
-6. Install dependencies
+3. **Set up code quality tooling** (linting, formatting, type checking)
+4. Set up the entry point / CLI
+5. Create placeholder files for each module
+6. Create the test directory structure
+7. Install dependencies
+8. Verify all tools pass on the placeholder code
 
 Language-specific setup:
-| Language | Package Manager | Config File | Layout |
-|---|---|---|---|
-| Python | `uv init --package` | `pyproject.toml` | `src/` layout |
-| TypeScript | `npm init` / `pnpm init` | `package.json` + `tsconfig.json` | `src/` layout |
-| Rust | `cargo init` | `Cargo.toml` | `src/` layout |
-| Go | `go mod init` | `go.mod` | flat or `cmd/` + `internal/` |
+| Language | Package Manager | Config File | Layout | Linter/Formatter | Type Checker |
+|---|---|---|---|---|---|
+| Python | `uv init --package` | `pyproject.toml` | `src/` layout | **ruff** (lint + format) | **mypy** (strict mode) |
+| TypeScript | `npm init` / `pnpm init` | `package.json` + `tsconfig.json` | `src/` layout | **eslint** + **prettier** | **tsc** (`strict: true`) |
+| Rust | `cargo init` | `Cargo.toml` | `src/` layout | **clippy** + **rustfmt** | Built-in (compiler) |
+| Go | `go mod init` | `go.mod` | flat or `cmd/` + `internal/` | **golangci-lint** + **gofmt** | Built-in (compiler) |
 
-**Verify:** The project builds/runs with placeholder implementations.
+#### Code Quality Tooling (Required)
+
+Every bootstrapped project must include linting, formatting, and type checking from day one. This catches bugs early and keeps sub-agent output consistent.
+
+**Python example** (`pyproject.toml`):
+```toml
+[dependency-groups]
+dev = ["pytest>=8.0", "pytest-cov>=6.0", "ruff>=0.9", "mypy>=1.10"]
+
+[tool.ruff]
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "RUF"]
+
+[tool.mypy]
+strict = true
+plugins = ["pydantic.mypy"]  # if using pydantic
+```
+
+**TypeScript example** (`tsconfig.json`):
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitReturns": true
+  }
+}
+```
+
+**Verify:** The project builds/runs with placeholder implementations, and `lint + typecheck` pass clean.
 
 ### Phase 4: Create Sub-Agents
 
@@ -164,9 +197,12 @@ Checklist:
 - [ ] Project builds/installs without errors
 - [ ] Entry point runs (even if it just prints "not implemented")
 - [ ] Tests pass (even if they're just placeholders)
-- [ ] Linter passes
+- [ ] Linter passes clean (ruff / eslint / clippy)
+- [ ] Type checker passes clean (mypy strict / tsc strict)
+- [ ] Formatter produces no changes (ruff format / prettier)
 - [ ] All agent files exist in `.claude/agents/`
 - [ ] CLAUDE.md is complete and accurate
+- [ ] CLAUDE.md commands section includes lint, format, and typecheck commands
 - [ ] Skills are installed and accessible
 - [ ] Seed data / config files exist
 
